@@ -12,5 +12,3 @@ document.getElementById('selectCrxBtn').addEventListener('click', async () => {
     const crxPath = await ipcRenderer.invoke('select-crx-folder');
     document.getElementById('crxPath').innerText = `Caminho da pasta CRX: ${crxPath || 'Nenhuma pasta selecionada'}`;
 });
-
-

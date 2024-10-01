@@ -1,31 +1,37 @@
-const { app, BrowserWindow } = require('electron');
+// src/main/main.js
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const path = require('path');
 
 let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true,
-    },
-  });
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
 
-  mainWindow.loadFile('src/renderer/index.html');
-  mainWindow.on('closed', function () {
-    mainWindow = null;
-  });
+    mainWindow.loadFile('src/renderer/index.html');
 }
 
 app.on('ready', createWindow);
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+
+// Seleção do arquivo JAR
+ipcMain.handle('select-jar-file', async () => {
+    const { filePaths } = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'JAR Files', extensions: ['jar'] }]
+    });
+    return filePaths[0];  // Retorna o caminho do arquivo selecionado
 });
 
-app.on('activate', function () {
-  if (mainWindow === null) {
-    createWindow();
-  }
+// Seleção da pasta CRX
+ipcMain.handle('select-crx-folder', async () => {
+    const { filePaths } = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+    });
+    return filePaths[0];  // Retorna o caminho da pasta selecionada
 });
